@@ -180,7 +180,7 @@ plt2 <- ggplot(data, aes(x = Date, y = Value/100, color = AreaName,
       ),
   ) +
   theme(
-    legend.position.inside = c(0.15, 0.9),
+    legend.position.inside = c(0.18, 0.9),
     legend.text = element_text(size = 10),
     legend.position = "inside",
     legend.background = element_rect(fill='transparent'),
