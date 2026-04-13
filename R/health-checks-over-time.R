@@ -53,6 +53,8 @@ data <- fingertips_data(
     Date > as.Date("2022-04-01")
   )
 
+# Birmingham-focused plot
+
 plt <- ggplot(data, aes(x = Date, y = Value/100, color = Area, 
                         group = AreaCode, order = Area)) +
   
@@ -81,14 +83,14 @@ plt <- ggplot(data, aes(x = Date, y = Value/100, color = Area,
   theme_bw() + 
   scale_color_manual(
     values = c(
-      c("Birmingham" = "purple", 
+      c("Birmingham" = "#b08ade", 
         "England" = "black", 
         "BBCSol ICB Cluster" = "gray")
     )
   ) +
   scale_fill_manual(
     values = c(
-      c("Birmingham" = "purple")
+      c("Birmingham" = "#b08ade")
     )
   ) +
   labs(
@@ -116,3 +118,76 @@ plt <- ggplot(data, aes(x = Date, y = Value/100, color = Area,
 plt
 
 ggsave("output/hc-over-time.png", plt, height = 5, width = 8)
+
+# All shown
+
+plt2 <- ggplot(data, aes(x = Date, y = Value/100, color = AreaName, 
+                        group = AreaCode)) +
+  
+  geom_line(lwd = 1.1) +
+  geom_ribbon(data = subset(data, AreaName == "Birmingham") ,
+              aes(ymin = LowerCI95.0limit/100, ymax = UpperCI95.0limit/100,
+                  fill = Area),
+              lwd = 0, alpha = 0.5, show.legend = FALSE) +
+  geom_hline(yintercept = 2.5/100, color = "red", linetype='dotted', lwd = 1.1) + 
+  geom_label(
+    data = data.frame(
+      Date = as.Date("2022-10-15"),
+      Value = 2.7,
+      label = "Quarterly 2.5% target",
+      Area = NA,
+      AreaCode = NA
+    ),
+    aes(label = label),
+    fill = "white",
+    alpha = 0.5,
+    label.size = 0,  # removes border,
+    hjust = 0,
+    col = "red"
+  ) +
+  theme_bw() + 
+  scale_color_manual(
+    values = c(
+      c("Birmingham" = "#b08ade", 
+        "England" = "black", 
+        "Dudley" = "#f88509",
+        "Sandwell"  = "#031d44",
+        "Solihull" = "#58c1f0",
+        "Walsall" = "darkgray",
+        "Wolverhampton" = "#90e7ae"
+        )
+    ),
+    guide = guide_legend(
+      ncol = 2
+    )
+  ) +
+  scale_fill_manual(
+    values = c(
+      c("Birmingham" = "#b08ade")
+    )
+  ) +
+  labs(
+    x = "",
+    y = "",
+    title = str_wrap(unique(data$IndicatorName), 100),
+    color = "",
+    caption = 
+      paste(
+        "Purple shaded region shows 95% confidence interval for Birmingham.", 
+        "Office for Health Improvement and Disparities. Public health profiles. ",
+        "2026 https://fingertips.phe.org.uk/ © Crown copyright 2026",
+        sep = "\n"
+      ),
+  ) +
+  theme(
+    legend.position.inside = c(0.15, 0.9),
+    legend.text = element_text(size = 10),
+    legend.position = "inside",
+    legend.background = element_rect(fill='transparent'),
+    plot.caption = element_text(color = "gray40", margin = margin(t = -5))
+  ) +
+  scale_y_continuous(labels = scales::percent) 
+
+plt2
+
+ggsave("output/hc-over-time-all.png", plt2, height = 5, width = 8)
